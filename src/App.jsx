@@ -7,7 +7,7 @@ import axios from "axios";
 function App() {
   const [count, setCount] = useState(0);
   const [data, setData] = useState([]);
-  const apiData = "https://openlibrary.org/search.json?author=Kushwant+Singh";
+  const apiData = "https://openlibrary.org/search.json?author=Jane+Austen";
   // const getBooks = async () => {
   //   const authorData = await axios.get(apiData);
   //   console.log(authorData.data.docs);
