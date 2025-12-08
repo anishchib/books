@@ -1,5 +1,7 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
+// import axios from "axios";
+// import { useEffect, useState } from "react";
+
+import BookLoader from "./BookLoader";
 
 export default function BookCard({
   title,
@@ -20,6 +22,7 @@ export default function BookCard({
   //     };
   //     fetchEditionKey();
   //   }, [title]);
+
   return (
     <li className="book-card-item">
       {/* IMAGE SECTION */}
@@ -35,10 +38,10 @@ export default function BookCard({
         <h3 className="book-card-title">{title}</h3>
 
         <p className="book-card-authors">
-          by{" "}
+          by
           {authors.map((name, index) => (
             <span key={index}>
-              {name}
+              {` ${name}`}
               {index < authors.length - 1 ? " and " : ""}
             </span>
           ))}

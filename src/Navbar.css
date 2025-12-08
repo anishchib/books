@@ -1,0 +1,51 @@
+/* Navbar.css */
+.navbar {
+  width: 100%;
+  background: #ffffff;
+  padding: 16px;
+  border-bottom: 1px solid #e5e5e5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.nav-title {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.nav-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-search input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+}
+
+.nav-search button {
+  background: #007bff;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.nav-search button:hover {
+  background: #005fcc;
+}
+
+.nav-count {
+  font-size: 16px;
+  font-weight: 500;
+  color: #444;
+  margin-right: 16px;
+  padding: 5px;
+}
