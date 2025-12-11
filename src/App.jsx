@@ -30,7 +30,7 @@ function App() {
   // concount,st [loader, setLoader] = useState(false);
   // const [error1, setError1] = useState(""); // const [query,setQuery] = useState('');
   const [status, setStatus] = useState("idle");
-  const [workdDetails, setWorkDetails] = useState([]);
+  const [workDetails, setWorkDetails] = useState([]);
   // const query = "Anish";
   //const apiData = `https://openlibrary.org/search.json?author=${query}`;
   // const apiData = `https://openlibrary.org/search/authors.json?q=${query}`;
@@ -58,7 +58,7 @@ function App() {
           `https://openlibrary.org${selectedWork}/editions.json`,
           { signal: controller.signal }
         );
-        console.log(works.data.entries);
+        console.log(works.data.entries[0]);
         setWorkDetails(works.data.entries);
       } catch (error) {
         console.error("Error fetching works:", error);
@@ -147,7 +147,7 @@ function App() {
         <div className="box right-box">
           {/* {selectedWork && <p>{selectedWork}</p>} */}
           {/* <BookWorkDetail work={work} /> */}
-          <BookWorkDetail work={workdDetails} />
+          <BookWorkDetail works={workDetails} />
         </div>
       </div>
       {/* {loader ? <BookLoader /> : <BookList books={bookData} />} */}

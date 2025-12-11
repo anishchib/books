@@ -1,31 +1,43 @@
 // BookWorkDetail.jsx
-import React from "react";
+import React, { useEffect, useMemo } from "react";
+import axios from "axios";
 
 function BookWorkDetail({ works }) {
-  if (!works) return null;
-  console.log(works);
-  const {
-    title,
-    subtitle,
-    author,
-    publishDate,
-    publisher,
-    language,
-    pages,
-    coverImage,
-    editionId,
-    workId,
-    editionNotes,
-  } = works;
-  console.log(title);
+  const [authorsName, setAuthorsName] = React.useState([]);
+
+  const work = useMemo(() => {
+    return Array.isArray(works) && works.length > 0 ? works[0] : {};
+  }, [works]);
+
+  useEffect(() => {
+    if (!work?.authors || work.authors.length === 0) return;
+
+    const fetchAuthors = async () => {
+      try {
+        const requests = work.authors.map((a) =>
+          axios.get(`https://openlibrary.org${a.key}.json`)
+        );
+
+        const responses = await Promise.all(requests);
+        const names = responses.map((res) => res.data.name);
+
+        setAuthorsName(names);
+      } catch (err) {
+        console.error("Error fetching author names:", err);
+      }
+    };
+
+    fetchAuthors();
+  }, [work]);
+
+  console.log(work.authors);
   return (
     <div style={styles.page}>
-      {/* Header / Breadcrumb-style info */}
       <div style={styles.breadcrumb}>
         <span style={styles.breadcrumbDim}>An edition of</span>{" "}
-        <span>{title}</span>
-        {publishDate && (
-          <span style={styles.breadcrumbDim}>({publishDate})</span>
+        <span>{work.title}</span>
+        {work.publishDate && (
+          <span style={styles.breadcrumbDim}>({work.publishDate})</span>
         )}
       </div>
 
@@ -33,8 +45,8 @@ function BookWorkDetail({ works }) {
       <header style={styles.header}>
         <div style={styles.coverColumn}>
           <div style={styles.coverWrapper}>
-            {coverImage ? (
-              <img src={coverImage} alt={title} style={styles.cover} />
+            {work.coverImage ? (
+              <img src={work.coverImage} alt={work.title} style={styles.cover} />
             ) : (
               <div style={styles.coverPlaceholder}>No cover</div>
             )}
@@ -42,30 +54,35 @@ function BookWorkDetail({ works }) {
         </div>
 
         <div style={styles.mainInfo}>
-          <h1 style={styles.title}>{title}</h1>
-          {subtitle && <h2 style={styles.subtitle}>{subtitle}</h2>}
+          <h1 style={styles.title}>{work.title}</h1>
+          {work.subtitle && <h2 style={styles.subtitle}>{work.subtitle}</h2>}
 
-          {author && (
+          {work.authors && (
             <p style={styles.author}>
               <span>by </span>
-              <strong>{author}</strong>
+              {authorsName.map((a, i) => (
+                <>
+                  <strong key={i}>{a}</strong>
+                  {i < work.authors.length - 1 && ", "}
+                </>
+              ))}
             </p>
           )}
 
           <div style={styles.metaRow}>
-            {publisher && (
+            {work.publisher && (
               <span>
-                <strong>Publisher:</strong> {publisher}
+                <strong>Publisher:</strong> {work.publisher}
               </span>
             )}
-            {language && (
+            {work.language && (
               <span>
-                <strong>Language:</strong> {language}
+                <strong>Language:</strong> {work.language}
               </span>
             )}
-            {pages && (
+            {work.pages && (
               <span>
-                <strong>Pages:</strong> {pages}
+                <strong>Pages:</strong> {work.pages}
               </span>
             )}
           </div>
@@ -91,30 +108,30 @@ function BookWorkDetail({ works }) {
 
             <div style={styles.detailBlock}>
               <h4 style={styles.detailHeading}>Edition notes</h4>
-              <p>{editionNotes || "Exhibition catalogue Jan.–Feb. 1983."}</p>
+              <p>{work.editionNotes || "Exhibition catalogue Jan.–Feb. 1983."}</p>
             </div>
 
             <div style={styles.detailBlock}>
               <h4 style={styles.detailHeading}>The physical object</h4>
               <p>
-                <strong>Pagination:</strong> {pages ? `${pages} p.` : "14 p."}
+                <strong>Pagination:</strong> {work.pages ? `${work.pages} p.` : "14 p."}
               </p>
               <p>
-                <strong>Number of pages:</strong> {pages || 14}
+                <strong>Number of pages:</strong> {work.pages || 14}
               </p>
             </div>
 
             <div style={styles.detailBlock}>
               <h4 style={styles.detailHeading}>Edition identifiers</h4>
               <p>
-                <strong>Open Library:</strong> {editionId || "OL21464084M"}
+                <strong>Open Library:</strong> {work.editionId || "OL21464084M"}
               </p>
             </div>
 
             <div style={styles.detailBlock}>
               <h4 style={styles.detailHeading}>Work identifiers</h4>
               <p>
-                <strong>Work ID:</strong> {workId || "OL13389498W"}
+                <strong>Work ID:</strong> {work.workId || "OL13389498W"}
               </p>
             </div>
           </section>
@@ -132,10 +149,10 @@ function BookWorkDetail({ works }) {
               <tbody>
                 <tr>
                   <td style={styles.td}>
-                    <strong>{title}</strong>
+                    <strong>{work.title}</strong>
                     <div style={styles.smallMuted}>
-                      {publishDate || "1983"},{" "}
-                      {publisher || "Galerie 't Venster"}
+                      {work.publishDate || "1983"},{" "}
+                      {work.publisher || "Galerie 't Venster"}
                     </div>
                   </td>
                   <td style={styles.td}>Locate</td>
