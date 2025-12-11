@@ -19,8 +19,9 @@ export default function NavBar({ author, setAuthor, count = 0 }) {
         <input
           type="text"
           placeholder="Search Authors for titles..."
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
+          value={input}
+          //onChange={(e) => setAuthor(e.target.value)}
+          onChange={(e) => setInput(e.target.value)}
         />
         <button type="submit">Search</button>
       </form>

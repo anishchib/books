@@ -1,14 +1,16 @@
 // import axios from "axios";
-// import { useEffect, useState } from "react";
+//import { useEffect, useState } from "react";
 
 import BookLoader from "./BookLoader";
 
 export default function BookCard({
+  works,
   title,
   authors = [],
   publishYear,
   editions,
   editionKey,
+  onSelectBook,
 }) {
   //   const [ek, setEk] = useState("");
 
@@ -23,8 +25,12 @@ export default function BookCard({
   //     fetchEditionKey();
   //   }, [title]);
 
+  const handleBookDetails = () => {
+    alert(`More details about "${title}" will be available soon!`);
+    onSelectBook(works);
+  };
   return (
-    <li className="book-card-item">
+    <li className="book-card-item" onClick={handleBookDetails}>
       {/* IMAGE SECTION */}
       <div className="book-card-image">
         <img
