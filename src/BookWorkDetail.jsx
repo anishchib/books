@@ -4,22 +4,27 @@ import axios from "axios";
 
 function BookWorkDetail({ works }) {
   const [authorsName, setAuthorsName] = React.useState([]);
-
-  const work = useMemo(() => {
-    return Array.isArray(works) && works.length > 0 ? works[0] : {};
-  }, [works]);
+  console.log(works.key);
 
   useEffect(() => {
-    if (!work?.authors || work.authors.length === 0) return;
+    // const work = Array.isArray(works) && works.length > 0 ? works[0] : {};
+
+    if (!works?.authors || works.authors.length === 0) return;
 
     const fetchAuthors = async () => {
       try {
-        const requests = work.authors.map((a) =>
+        const requests = works.authors.map((a) =>
           axios.get(`https://openlibrary.org${a.key}.json`)
         );
 
         const responses = await Promise.all(requests);
         const names = responses.map((res) => res.data.name);
+        if (!works?.isbn_13 || !works?.publishers) {
+          return;
+        }
+        const isbn = works.isbn_13[0];
+        const publisher = works.publishers[0];
+        console.log(`${isbn} and ${publisher}`);
 
         setAuthorsName(names);
       } catch (err) {
@@ -28,16 +33,16 @@ function BookWorkDetail({ works }) {
     };
 
     fetchAuthors();
-  }, [work]);
+  }, [works]);
 
-  console.log(work.authors);
+  console.log(works.authors);
   return (
     <div style={styles.page}>
       <div style={styles.breadcrumb}>
         <span style={styles.breadcrumbDim}>An edition of</span>{" "}
-        <span>{work.title}</span>
-        {work.publishDate && (
-          <span style={styles.breadcrumbDim}>({work.publishDate})</span>
+        <span>{works.title}</span>
+        {works.publishDate && (
+          <span style={styles.breadcrumbDim}>({works.publishDate})</span>
         )}
       </div>
 
@@ -45,8 +50,12 @@ function BookWorkDetail({ works }) {
       <header style={styles.header}>
         <div style={styles.coverColumn}>
           <div style={styles.coverWrapper}>
-            {work.coverImage ? (
-              <img src={work.coverImage} alt={work.title} style={styles.cover} />
+            {works.key ? (
+              <img
+                src={`https://covers.openlibrary.org/b/olid/${works.key.slice(-11)}-L.jpg`}
+                alt={works.title}
+                style={styles.cover}
+              />
             ) : (
               <div style={styles.coverPlaceholder}>No cover</div>
             )}
@@ -54,35 +63,50 @@ function BookWorkDetail({ works }) {
         </div>
 
         <div style={styles.mainInfo}>
-          <h1 style={styles.title}>{work.title}</h1>
-          {work.subtitle && <h2 style={styles.subtitle}>{work.subtitle}</h2>}
+          <h1 style={styles.title}>{works.title}</h1>
+          {works.subtitle && <h2 style={styles.subtitle}>{works.subtitle}</h2>}
 
-          {work.authors && (
+          {works.authors && (
             <p style={styles.author}>
               <span>by </span>
-              {authorsName.map((a, i) => (
-                <>
-                  <strong key={i}>{a}</strong>
-                  {i < work.authors.length - 1 && ", "}
-                </>
-              ))}
+              {/* {authorsName.map((a, i) => (
+                <React.Fragment key={i}>
+                  <strong>{a}</strong>
+                  {i < works.authors.length - 1 && ", "}
+                </React.Fragment>
+              ))} */}
+              <strong>{authorsName.join(", ")}</strong>
             </p>
           )}
 
           <div style={styles.metaRow}>
-            {work.publisher && (
+            {works.publishers && (
               <span>
-                <strong>Publisher:</strong> {work.publisher}
+                <strong>Publisher:</strong> {works.publishers.join(", ")}
               </span>
             )}
-            {work.language && (
+            {works.languages && (
               <span>
-                <strong>Language:</strong> {work.language}
+                <strong>Language:</strong>{" "}
+                {works.languages.map((lang) => lang.key).join(", ")}
               </span>
             )}
-            {work.pages && (
+            {works.pagination && (
               <span>
-                <strong>Pages:</strong> {work.pages}
+                <strong>Pages:</strong> {works.pagination}
+              </span>
+            )}
+
+            {works.works && (
+              <span>
+                <strong>Work ID: </strong>
+                {works.works.map((w) => w.key).join(" , ") || "OL13389498W"}
+              </span>
+            )}
+
+            {works.key && (
+              <span>
+                <strong>Edition ID:</strong> {works.key.slice(-11) || "OL21464084M"}
               </span>
             )}
           </div>
@@ -101,87 +125,17 @@ function BookWorkDetail({ works }) {
               your app UI.
             </p>
           </section>
-
-          {/* Book Details */}
-          <section style={styles.section}>
-            <h3 style={styles.sectionTitle}>Book details</h3>
-
-            <div style={styles.detailBlock}>
-              <h4 style={styles.detailHeading}>Edition notes</h4>
-              <p>{work.editionNotes || "Exhibition catalogue Jan.–Feb. 1983."}</p>
-            </div>
-
-            <div style={styles.detailBlock}>
-              <h4 style={styles.detailHeading}>The physical object</h4>
-              <p>
-                <strong>Pagination:</strong> {work.pages ? `${work.pages} p.` : "14 p."}
-              </p>
-              <p>
-                <strong>Number of pages:</strong> {work.pages || 14}
-              </p>
-            </div>
-
-            <div style={styles.detailBlock}>
-              <h4 style={styles.detailHeading}>Edition identifiers</h4>
-              <p>
-                <strong>Open Library:</strong> {work.editionId || "OL21464084M"}
-              </p>
-            </div>
-
-            <div style={styles.detailBlock}>
-              <h4 style={styles.detailHeading}>Work identifiers</h4>
-              <p>
-                <strong>Work ID:</strong> {work.workId || "OL13389498W"}
-              </p>
-            </div>
-          </section>
-
-          {/* Editions table (simplified) */}
-          <section style={styles.section}>
-            <h3 style={styles.sectionTitle}>Editions</h3>
-            <table style={styles.table}>
-              <thead>
-                <tr>
-                  <th style={styles.th}>Edition</th>
-                  <th style={styles.th}>Availability</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style={styles.td}>
-                    <strong>{work.title}</strong>
-                    <div style={styles.smallMuted}>
-                      {work.publishDate || "1983"},{" "}
-                      {work.publisher || "Galerie 't Venster"}
-                    </div>
-                  </td>
-                  <td style={styles.td}>Locate</td>
-                </tr>
-              </tbody>
-            </table>
-          </section>
         </div>
 
         {/* Right column - actions / rating / lists (dummy) */}
         <aside style={styles.rightColumn}>
           <section style={styles.sideSection}>
-            <button style={styles.primaryButton}>Want to Read</button>
-            <button style={styles.secondaryButton}>Currently Reading</button>
-            <button style={styles.secondaryButton}>Already Read</button>
+            <button style={styles.primaryButton}>Add to my books</button>
           </section>
 
           <section style={styles.sideSection}>
             <h4 style={styles.detailHeading}>My rating</h4>
             <div style={styles.starsRow}>★ ★ ★ ★ ★</div>
-          </section>
-
-          <section style={styles.sideSection}>
-            <h4 style={styles.detailHeading}>My book notes</h4>
-            <textarea
-              placeholder="Add a private note about this edition..."
-              rows={4}
-              style={styles.textarea}
-            />
           </section>
         </aside>
       </div>

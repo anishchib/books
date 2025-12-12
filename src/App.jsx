@@ -58,8 +58,8 @@ function App() {
           `https://openlibrary.org${selectedWork}/editions.json`,
           { signal: controller.signal }
         );
-        console.log(works.data.entries[0]);
-        setWorkDetails(works.data.entries);
+        //  console.log(works.data.entries[0]);
+        setWorkDetails(works.data.entries[0]);
       } catch (error) {
         console.error("Error fetching works:", error);
       }
@@ -147,7 +147,7 @@ function App() {
         <div className="box right-box">
           {/* {selectedWork && <p>{selectedWork}</p>} */}
           {/* <BookWorkDetail work={work} /> */}
-          <BookWorkDetail works={workDetails} />
+          {selectedWork && <BookWorkDetail works={workDetails} />}
         </div>
       </div>
       {/* {loader ? <BookLoader /> : <BookList books={bookData} />} */}
